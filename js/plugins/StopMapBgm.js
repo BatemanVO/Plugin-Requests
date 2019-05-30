@@ -27,9 +27,7 @@
 
     StopMapBgm.replayBattleBgsAndBgm = BattleManager.replayBgmAndBgs;
     BattleManager.replayBgmAndBgs = function() {
-        console.log($gameSwitches, $gameSwitches._data, $gameSwitches._data[stopSwitch]);
         if ($gameSwitches._data[stopSwitch]) {
-            console.log('Set the mapBgm to null!');
             BattleManager._mapBgm = null;
         }
         StopMapBgm.replayBattleBgsAndBgm.call(BattleManager);
