@@ -15,24 +15,28 @@
     module.Zevia = module.Zevia || {};
     var EventRegionCommonEvent = module.Zevia.EventRegionCommonEvent = {};
 
+    Game_Event.prototype.regionCommonEvent = function() {
+        if (this.isMoving()) { return; }
+
+        var regionCommonEvent = $dataMap.events[this._eventId].meta.regionCommonEvent;
+        if (!regionCommonEvent) { return; }
+
+        var regionAndEventIds = regionCommonEvent.split(',');
+        if (regionAndEventIds.length !== 2) { return; }
+
+        if (this.regionId() === parseInt(regionAndEventIds[0])) {
+            if (!this._hasRunCommonEvent) {
+                $gameTemp.reserveCommonEvent(parseInt(regionAndEventIds[1]));
+                this._hasRunCommonEvent = true;
+            }
+        } else {
+            this._hasRunCommonEvent = false;
+        }
+    };
+
     EventRegionCommonEvent.update = Game_Event.prototype.update;
     Game_Event.prototype.update = function() {
-        if (!this.isMoving()) {
-            var regionCommonEvent = $dataMap.events[this._eventId].meta.regionCommonEvent;
-            if (regionCommonEvent) {
-                var regionAndEventIds = regionCommonEvent.split(',');
-                if (regionAndEventIds.length === 2) {
-                    if (this.regionId() === parseInt(regionAndEventIds[0])) {
-                        if (!this._hasRunCommonEvent) {
-                            $gameTemp.reserveCommonEvent(parseInt(regionAndEventIds[1]));
-                            this._hasRunCommonEvent = true;
-                        }
-                    } else {
-                        this._hasRunCommonEvent = false;
-                    }
-                }
-            }
-        }
+        this.regionCommonEvent();
         EventRegionCommonEvent.update.call(this);
     };
 })(window);
