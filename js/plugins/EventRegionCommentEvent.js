@@ -1,5 +1,5 @@
 /*:
-* @plugindesc Allows events to have comments that indicate if they move to a region Id, they should
+* @plugindesc Allows events to have notes that indicate if they move to a region Id, they should
 * call a common event.
 * @author Zevia
 *
