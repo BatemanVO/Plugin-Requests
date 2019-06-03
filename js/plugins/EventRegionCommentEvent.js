@@ -13,12 +13,8 @@
 * page will execute whenever the event moves onto a tile with that ID.
 *
 * Note that a comment with the text "<regionCondition: x>" must be the first
-* command at the top of a page and you should only use one page for any given
-* region ID condition (so don't have two pages with, for example,
-* "<regionCondition: 21>" as a comment).
-*
-* When using regionCondition, all other conditions for the page must also
-* be met in order to execute that page's logic.
+* command at the top of a page. When using regionCondition, all other
+* conditions for the page must also be met in order to execute that page's logic.
 *
 * In both cases, the event will only fire the first time the event enters
 * an "area" of that region. As an example, if there are 5 tiles in a row
