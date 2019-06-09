@@ -1,15 +1,14 @@
 /*:
-* @plugindesc Allows events to have notes that indicate if they move to a region Id, they should
-* call a common event or act as a page condition to auto-execute.
+* @plugindesc Allows events to have notes that indicate if they move to a region Id, they should call a common event or act as a page condition to auto-execute.
 * @author Zevia
 *
 * @help In the event's note box (next to its name in the top), make a comment with
 * the format <regionCommonEvent: x, y>, where x is the region ID and y is the
-* number of the common event to call if the event moves onto the specified region
-* ID.
+* number of the common event to call if the event moves onto the specified
+* region ID.
 *
-* IMPORTANT: By default, this functionality is tied to Switch 15, so that it only
-* works if that switch is ON. Ensure that when you want the common event
+* IMPORTANT: By default, this functionality is tied to Switch 15, so that it
+* only works if that switch is ON. Ensure that when you want the common event
 * functionality to work, you have turned the corresponding Switch ON. You can
 * change the switch number in the Plugin parameters.
 *
@@ -23,7 +22,8 @@
 *
 * Note that a comment with the text "<regionCondition: x>" must be the first
 * command at the top of a page. When using regionCondition, all other
-* conditions for the page must also be met in order to execute that page's logic.
+* conditions for the page must also be met in order to execute that page's
+* logic.
 *
 * In both cases, the event will only fire the first time the event enters
 * an "area" of that region. As an example, if there are 5 tiles in a row
