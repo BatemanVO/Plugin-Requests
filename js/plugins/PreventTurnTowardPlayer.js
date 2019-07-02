@@ -3,7 +3,10 @@
 * @author Zevia
 *
 * @help When an event would normally turn towards the player and be "locked" in
-* place, the event will no longer turn towards the player.
+* place, the event will no longer turn towards the player if its name has
+* the text "[NOTURN]" in it. As an example, if you have an event named
+* "EV004 [NOTURN]", then it will not turn towards the player when interacted
+* with.
 *
 * This Plugin will likely have compatibility issues with other Plugins that
 * overwrite the lock functionality on Game_Event. You can try loading this
@@ -18,7 +21,11 @@
     PreventTurnTowardPlayer.lock = Game_Event.prototype.lock;
     Game_Event.prototype.lock = function() {
         if (!this._locked) {
+            console.log(this, $dataMap.events[this._eventId]);
             this._prelockDirection = this.direction();
+            if (!$dataMap.events[this._eventId].name.match(/\[NOTURN\]/i)) {
+                this.turnTowardPlayer();
+            }
             this._locked = true;
         }
     }
