@@ -17,11 +17,11 @@
 
     CenterChoiceText.drawItem = Window_ChoiceList.prototype.drawItem;
     Window_ChoiceList.prototype.drawItem = function(index) {
-        var rect = this.itemRectForText(index);
+        var text = this.commandName(index);
         this.drawTextEx(
-            this.commandName(index),
-            ((this.width - this.textWidthEx(this.commandName(index))) / 2) - this.standardPadding(),
-            rect.y
+            text,
+            ((this.width - this.textWidthEx(text)) / 2) - this.standardPadding(),
+            this.itemRectForText(index).y
         );
     };
 })(window);
