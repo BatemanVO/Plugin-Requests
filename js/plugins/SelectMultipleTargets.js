@@ -208,6 +208,17 @@
         SelectMultipleTargets.resetTargets();
     };
 
+    SelectMultipleTargets.changeActor = BattleManager.changeActor;
+    BattleManager.changeActor = function(newActorIndex, lastActorActionState) {
+        const previousActor = $gameParty.members()[newActorIndex];
+        if (previousActor) {
+            previousActor._actions.forEach(function(action) {
+                action._multipleTargets = [];
+            });
+        }
+        SelectMultipleTargets.changeActor.call(BattleManager, newActorIndex, lastActorActionState);
+    };
+
     Game_Action.prototype.confirmTargets = function() {
         var isForDeadFriend = this.isForDeadFriend();
         var isForFriend = this.isForFriend();
