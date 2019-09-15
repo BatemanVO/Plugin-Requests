@@ -210,7 +210,7 @@
 
     SelectMultipleTargets.changeActor = BattleManager.changeActor;
     BattleManager.changeActor = function(newActorIndex, lastActorActionState) {
-        const previousActor = $gameParty.members()[newActorIndex];
+        var previousActor = $gameParty.members()[newActorIndex];
         if (previousActor) {
             previousActor._actions.forEach(function(action) {
                 action._multipleTargets = [];
