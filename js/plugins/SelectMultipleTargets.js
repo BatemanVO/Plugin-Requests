@@ -240,13 +240,13 @@
 
     SelectMultipleTargets.targetsForOpponents = Game_Action.prototype.targetsForOpponents;
     Game_Action.prototype.targetsForOpponents = function() {
-        if (this._multipleTargets && this._multipleTargets.length) { return this.confirmTargets(); }
+        if (this._multipleTargets && this._multipleTargets.length > 1) { return this.confirmTargets(); }
         return SelectMultipleTargets.targetsForOpponents.call(this);
     };
 
     SelectMultipleTargets.targetsForFriends = Game_Action.prototype.targetsForFriends;
     Game_Action.prototype.targetsForFriends = function() {
-        if (this._multipleTargets && this._multipleTargets.length) { return this.confirmTargets(); }
+        if (this._multipleTargets && this._multipleTargets.length > 1) { return this.confirmTargets(); }
         return SelectMultipleTargets.targetsForFriends.call(this);
     };
 })(window);
