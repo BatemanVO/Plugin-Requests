@@ -39,7 +39,7 @@
 * @param enemyCommonEventId
 * @text Enemy Death Common Event ID
 * @type number
-* @desc The ID of the common events to call whenever an Enemy dies.
+* @desc The ID of the common event to call whenever an Enemy dies.
 * @default 2
 *
 * @param targetId
