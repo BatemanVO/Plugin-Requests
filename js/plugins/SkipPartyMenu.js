@@ -7,11 +7,27 @@
 * to the end of the command menu. The Escape command can be removed altogether
 * by changing the "Add Escape Command" parameter in the configuration.
 *
+* The formation command can also be added at the end of the menu, just above
+* "Escape", if "Add Formation Command" is checked. You can also enable it in
+* the game, but temporarily disable it by turning on and off the switch
+* specified in the configuration. By default, it's switch 20.
+*
 * @param isEscapeEnabled
 * @text Add Escape Command
 * @type boolean
 * @desc Whether the Escape command will be added to the actor's command list or not
 * @default true
+*
+* @param isFormationEnabled
+* @text Add Formation Command
+* @type boolean
+* @desc Whether the Formation command will be added to the actor's command list or not
+* @default false
+*
+* @param disableFormationSwitch
+* @text Switch number that, if on, disables formation in battle
+* @type switch
+* @default 20
 *
 * @param shouldDisablePartyMenu
 * @text Disable Party Menu
@@ -26,8 +42,11 @@
     module.Zevia = module.Zevia || {};
     var SkipPartyMenu = module.Zevia.SkipPartyMenu = {};
     var ESCAPE_SYMBOL = 'escape';
+    var FORMATION_SYMBOL = 'formation';
     var parameters = PluginManager.parameters('SkipPartyMenu');
     var isEscapeEnabled = !!parameters.isEscapeEnabled.match(/true/i);
+    var isFormationEnabled = !!parameters.isFormationEnabled.match(/true/i);
+    var disableFormationSwitch = parseInt(parameters.disableFormationSwitch);
     var shouldDisablePartyMenu = !!parameters.shouldDisablePartyMenu.match(/true/i);
 
     SkipPartyMenu.shouldPreventCancelMenu = function() {
@@ -47,9 +66,46 @@
         BattleManager.selectNextCommand();
     };
 
-    SkipPartyMenu.createActorCommandWindow = Scene_Battle.prototype.createActorCommandWindow;
-    Scene_Battle.prototype.createActorCommandWindow = function() {
-        SkipPartyMenu.createActorCommandWindow.call(this);
+    Scene_Battle.prototype.setFormationMode = function(isForming) {
+        this._isForming = isForming;
+    };
+    Scene_Battle.prototype.resetFormationSelections = function() {
+        this._actorWindow._pendingIndex = null;
+    };
+
+    SkipPartyMenu.onActorOk = Scene_Battle.prototype.onActorOk;
+    Scene_Battle.prototype.onActorOk = function() {
+        if (!this._isForming) {
+            SkipPartyMenu.onActorOk.call(this);
+            return;
+        }
+        this._actorWindow.activate();
+
+        SoundManager.playOk();
+        if (!this._actorWindow._pendingIndex && this._actorWindow._pendingIndex !== 0) {
+            this._actorWindow._pendingIndex = this._actorWindow.index();
+            this._actorWindow.refresh();
+        } else {
+            $gameParty.swapOrder(this._actorWindow._pendingIndex, this._actorWindow.index());
+            this._actorWindow.hide();
+            this.selectNextCommand();
+            this.setFormationMode(false);
+            this._statusWindow.refresh();
+        }
+    };
+
+    SkipPartyMenu.onActorCancel = Scene_Battle.prototype.onActorCancel;
+    Scene_Battle.prototype.onActorCancel = function() {
+        if (!this._isForming) {
+            SkipPartyMenu.onActorCancel.call(this);
+            return;
+        }
+        this._actorWindow.hide();
+        this.setFormationMode(false);
+        this.resetFormationSelections();
+    };
+
+    Scene_Battle.prototype.addEscapeCommand = function() {
         if (!isEscapeEnabled) { return; }
 
         this._actorCommandWindow.setHandler(ESCAPE_SYMBOL, function() {
@@ -59,6 +115,23 @@
                 SceneManager._scene._actorCommandWindow.deactivate();
             }
         });
+    };
+
+    Scene_Battle.prototype.addFormationCommand = function() {
+        if (!isFormationEnabled) { return; }
+
+        this._actorCommandWindow.setHandler(FORMATION_SYMBOL, () => {
+            this.resetFormationSelections();
+            this.setFormationMode(true);
+            this.selectActorSelection();
+        });
+    };
+
+    SkipPartyMenu.createActorCommandWindow = Scene_Battle.prototype.createActorCommandWindow;
+    Scene_Battle.prototype.createActorCommandWindow = function() {
+        SkipPartyMenu.createActorCommandWindow.call(this);
+        this.addEscapeCommand();
+        this.addFormationCommand();
     };
 
     SkipPartyMenu.changeInputWindow = Scene_Battle.prototype.changeInputWindow;
@@ -79,10 +152,22 @@
         }
     };
 
+    Window_BattleActor.prototype.drawItemBackground = Window_MenuStatus.prototype.drawItemBackground;
+
+    SkipPartyMenu.drawActorWindowItem = Window_BattleActor.prototype.drawItem;
+    Window_BattleActor.prototype.drawItem = function(index) {
+        SkipPartyMenu.drawActorWindowItem.call(this, index);
+        this.drawItemBackground(index);
+    };
+
     SkipPartyMenu.makeCommandList = Window_ActorCommand.prototype.makeCommandList;
     Window_ActorCommand.prototype.makeCommandList = function() {
         SkipPartyMenu.makeCommandList.call(this);
-        if (this._actor && isEscapeEnabled) {
+        if (!this._actor) { return; }
+        if (isFormationEnabled) {
+            this.addCommand(TextManager.formation, FORMATION_SYMBOL, !$gameSwitches.value(disableFormationSwitch));
+        }
+        if (isEscapeEnabled) {
             this.addCommand(TextManager.escape, ESCAPE_SYMBOL, BattleManager.canEscape());
         }
     };
