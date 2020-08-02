@@ -58,6 +58,19 @@
             );
     };
 
+    // Compatibility fixes for Yanfly BattleEngineCore
+    if (typeof(Yanfly) !== 'undefined' && Yanfly.BEC) {
+        SkipPartyMenu.needsSelection = Game_Action.prototype.needsSelection;
+        Game_Action.prototype.needsSelection = function() {
+            return this.item() && SkipPartyMenu.needsSelection.call(this);
+        }
+
+        SkipPartyMenu.checkItemScope = Game_Action.prototype.checkItemScope;
+        Game_Action.prototype.checkItemScope = function(list) {
+            return this.item() && SkipPartyMenu.checkItemScope.call(this, list);
+        };
+    }
+
     SkipPartyMenu.startBattlerInput = BattleManager.startInput;
     BattleManager.startInput = function() {
         SkipPartyMenu.startBattlerInput.call(this);
@@ -88,9 +101,15 @@
         } else {
             $gameParty.swapOrder(this._actorWindow._pendingIndex, this._actorWindow.index());
             this._actorWindow.hide();
-            this.selectNextCommand();
+            BattleManager.changeActor(BattleManager._actorIndex, 'waiting');
+            this._actorCommandWindow.activate();
+            this._actorWindow.deactivate();
+            this._skillWindow._actor = $gameParty.battleMembers()[BattleManager._actorIndex];
             this.setFormationMode(false);
             this._statusWindow.refresh();
+            const swappedMember = $gameParty.battleMembers()[this._actorWindow.index()];
+            swappedMember.deselect();
+            swappedMember.setActionState('undecided');
         }
     };
 
