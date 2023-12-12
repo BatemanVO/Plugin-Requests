@@ -21,7 +21,6 @@
     PreventTurnTowardPlayer.lock = Game_Event.prototype.lock;
     Game_Event.prototype.lock = function() {
         if (!this._locked) {
-            console.log(this, $dataMap.events[this._eventId]);
             this._prelockDirection = this.direction();
             if (!$dataMap.events[this._eventId].name.match(/\[NOTURN\]/i)) {
                 this.turnTowardPlayer();
