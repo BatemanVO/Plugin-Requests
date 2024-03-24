@@ -25,20 +25,23 @@
 
     var Zevia = module.Zevia || {};
 
-    var calculateEquipElementRate = function(property, elementRate, equip, elementId) {
-        if (!equip || !equip.meta || !equip.meta[property]) { return elementRate; }
-        var values = equip.meta[property].split(',');
-        if (Number(values[0].match(/\d+/)) !== elementId) { return elementRate; }
-        return elementRate * (values[1].match(/\d+/) / 100);
+    var calculateEquipElementRate = function(property, equips, rate, elementId) {
+        return equips.reduce(function(elementRate, equip) {
+            if (!equip || !equip.meta || !equip.meta[property]) { return elementRate; }
+            var values = equip.meta[property].split(',');
+            if (Number(values[0].match(/\d+/)) !== elementId) { return elementRate; }
+            return elementRate * (values[1].match(/\d+/) / 100);
+        }, rate);
     };
 
     Zevia.targetElementRate = Game_BattlerBase.prototype.elementRate;
-    Game_BattlerBase.prototype.elementRate = function(elementId) {
+    Game_BattlerBase.prototype.elementRate = function(elementId, subject) {
         var rate = Zevia.targetElementRate.call(this, elementId);
+        if (subject && subject.equips) {
+            return calculateEquipElementRate('elementOffense', subject.equips(), rate, elementId);
+        }
         if (!this.equips) { return rate; }
-        return this.equips().reduce(function(elementRate, equip) {
-            return calculateEquipElementRate('elementDefense', elementRate, equip, elementId);
-        }, rate);
+        return calculateEquipElementRate('elementDefense', this.equips(), rate, elementId);
     };
 
     Zevia.calcElementRate = Game_Action.prototype.calcElementRate;
@@ -47,8 +50,17 @@
         var elementId = this.item().damage.elementId;
         if (elementId < 0 || !this.subject().equips) { return rate; }
 
-        return this.subject().equips().reduce(function(elementRate, equip) {
-            return calculateEquipElementRate('elementOffense', elementRate, equip, elementId);
-        }, rate);
+        return calculateEquipElementRate('elementOffense', this.subject().equips(), rate, elementId);
+    };
+
+    Zevia.elementsMaxRate = Game_Action.prototype.elementsMaxRate;
+    Game_Action.prototype.elementsMaxRate = function(target, elements) {
+        var maxRate = Zevia.elementsMaxRate.call(this, target, elements);
+        var subject = this.subject();
+        if (!subject.equips || !elements.length) { return maxRate; }
+
+        return Math.max.apply(null, elements.map(function(elementId) {
+            return target.elementRate(elementId, subject);
+        }, this).concat(maxRate));
     };
 })(window);
