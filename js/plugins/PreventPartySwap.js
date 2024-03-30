@@ -1,6 +1,7 @@
 /*:
 * @plugindesc Allows a variable and switch to specify an actor Id to be "locked"
 * to the party such that they cannot be moved with the change party command
+* @author Zevia
 *
 * @help If the switch number configured in the parameters is set to ON, then
 * the actor whose Id matches the actorId variable configured in the

@@ -1,6 +1,7 @@
 /*:
 * @plugindesc Allows specifying element rates on equipment such
 * that equipped items can affect element offense and defense.
+* @author Zevia
 *
 * @help In the notes box of an equippable item, put <elementOffense: x, y> or
 * <elementDefense: x, y> where x is the Id of the element and y is the rate

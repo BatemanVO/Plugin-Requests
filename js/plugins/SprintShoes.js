@@ -1,6 +1,7 @@
 /*:
 * @plugindesc Allows the equipping and unequipping of an item to change
 * the player's overworld movement speed
+* @author Zevia
 *
 * @help In the notes box of an equippable item, put <changeMovementSpeed: x>, where
 * x is an Integer between 1 and 6. "Normal" move speed in the default engine
