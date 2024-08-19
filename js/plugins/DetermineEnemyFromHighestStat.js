@@ -1,5 +1,5 @@
 /*:
-* @plugindesc Provides Plugin commands to get an enemy based on the highest stat provided.
+* @plugindesc Provides Script call to get an enemy based on the highest stat provided.
 * @author Zevia
 *
 * @help Set aside a variable to store the Ids of every enemy that's been defeated.
